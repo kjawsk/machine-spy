@@ -4,10 +4,12 @@ BRPORT = 1884             -- MQTT broker port
 BRUSER = ""           -- If MQTT authenitcation is used then define the user
 BRPWD  = ""            -- The above user password
 CLIENTID = "ESP8266-" ..  node.chipid() -- The MQTT ID. Change to something you like
+TIMER_TIMEOUT = 5000
+MQTT_KEEPALIVE = 120
 
 -- connect to the broker
 print "Connecting to MQTT broker. Please wait..."
-m = mqtt.Client( CLIENTID, 120, BRUSER, BRPWD)
+m = mqtt.Client( CLIENTID, MQTT_KEEPALIVE, BRUSER, BRPWD)
 m:connect( BROKER , BRPORT, 0, function(conn)
     print("Connected to MQTT:" .. BROKER .. ":" .. BRPORT .." as " .. CLIENTID )
     run_main_prog()
@@ -28,5 +30,5 @@ end
 print "run main..."
 function run_main_prog()
      print("Main program")
-     tmr.alarm(2, 5000, 1, publish_data1 )
+     tmr.alarm(1, TIMER_TIMEOUT, tmr.ALARM_AUTO, publish_data1)
 end
