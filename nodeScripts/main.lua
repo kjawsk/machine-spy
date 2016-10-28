@@ -1,25 +1,32 @@
--- initiate the mqtt client and set keepalive timer to 120sec
-print("main")
-m = mqtt.Client("client_id", 120, "username", "password")
+-- Configuration to connect to the MQTT broker.
+BROKER = "192.168.0.103"   -- Ip/hostname of MQTT broker
+BRPORT = 1884             -- MQTT broker port
+BRUSER = ""           -- If MQTT authenitcation is used then define the user
+BRPWD  = ""            -- The above user password
+CLIENTID = "ESP8266-" ..  node.chipid() -- The MQTT ID. Change to something you like
 
-m:on("connect", function(con) print ("connected") end)
-m:on("offline", function(con) print ("offline") end)
-
--- on receive message
-m:on("message", function(conn, topic, data)
-  print(topic .. ":" )
-  if data ~= nil then
-    print(data)
-  end
+-- connect to the broker
+print "Connecting to MQTT broker. Please wait..."
+m = mqtt.Client( CLIENTID, 120, BRUSER, BRPWD)
+m:connect( BROKER , BRPORT, 0, function(conn)
+    print("Connected to MQTT:" .. BROKER .. ":" .. BRPORT .." as " .. CLIENTID )
+    run_main_prog()
 end)
 
-m:connect("192.168.0.103", 1884, 0, function(conn) 
-  print("connected")
-  -- subscribe topic with qos = 0
-  m:subscribe("/my_topic",0, function(conn)
-    -- publish a message with data = my_message, QoS = 0, retain = 0
-    m:publish("/test","my_message",0,0, function(conn) 
-      print("sent") 
+-- Control variables.
+id1 = 0
+
+print "Publish..."
+function publish_data1()
+    m:publish("/test","publish_data1 "..CLIENTID,0,0, function(conn)
+        print("Sending data1: " .. id1)
+        id1 = id1 + 1
     end)
-  end)
-end)
+end
+
+--main program to run after the subscriptions are done
+print "run main..."
+function run_main_prog()
+     print("Main program")
+     tmr.alarm(2, 5000, 1, publish_data1 )
+end
