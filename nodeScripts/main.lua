@@ -7,28 +7,38 @@ CLIENTID = "ESP8266-" ..  node.chipid() -- The MQTT ID. Change to something you 
 TIMER_TIMEOUT = 5000
 MQTT_KEEPALIVE = 120
 
--- connect to the broker
-print "Connecting to MQTT broker. Please wait..."
-m = mqtt.Client( CLIENTID, MQTT_KEEPALIVE, BRUSER, BRPWD)
-m:connect( BROKER , BRPORT, 0, function(conn)
-    print("Connected to MQTT:" .. BROKER .. ":" .. BRPORT .." as " .. CLIENTID )
-    run_main_prog()
-end)
-
 -- Control variables.
 id1 = 0
 
-print "Publish..."
-function publish_data1()
-    m:publish("/test","publish_data1 "..CLIENTID,0,0, function(conn)
-        print("Sending data1: " .. id1)
+-- connect to the broker
+print "Connecting to MQTT broker. Please wait..."
+m = mqtt.Client( CLIENTID, MQTT_KEEPALIVE, BRUSER, BRPWD)
+m:connect( BROKER , BRPORT, 0, run_main_prog, handle_connection_error)
+
+function publish_data()
+    m:publish("/test","publish_data "..CLIENTID,0,0, function(conn)
+        print("Sending data: " .. id1)
         id1 = id1 + 1
     end)
 end
 
+function receive_data(client, topic, data)
+    if data ~= nil then
+        print(topic .. " : " ..  data)
+    end
+end
+
 --main program to run after the subscriptions are done
-print "run main..."
 function run_main_prog()
-     print("Main program")
-     tmr.alarm(1, TIMER_TIMEOUT, tmr.ALARM_AUTO, publish_data1)
+    print("Connected to MQTT:" .. BROKER .. ":" .. BRPORT .." as " .. CLIENTID )
+
+    -- publish data with TIMER_TIMEOUT interval
+    tmr.alarm(1, TIMER_TIMEOUT, tmr.ALARM_AUTO, publish_data)
+
+    m:subscribe("/ping",0, function(client) print("subscribe success") end)
+    m:on("message", receive_data)
+end
+
+function handle_connection_error (client, reason)
+    print("failed reason: "..reason)
 end
