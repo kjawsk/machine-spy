@@ -23,7 +23,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-*.idea*
+.idea/
 .remote-sync-json
 
 # PyInstaller
