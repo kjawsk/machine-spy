@@ -1,0 +1,16 @@
+{
+  "uploadOnSave": true,
+  "useAtomicWrites": false,
+  "deleteLocal": true,
+  "hostname": "192.168.0.103",
+  "target": "/webapps/flask/machineSpy/",
+  "ignore": [
+    ".remote-sync.json",
+    ".git/**"
+  ],
+  "username": "root",
+  "password": "raspberry",
+  "watch": [],
+  "transport": "scp",
+  "port": "22"
+}
