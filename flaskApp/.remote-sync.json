@@ -6,7 +6,7 @@
   "target": "/webapps/flask/machineSpy/",
   "ignore": [
     ".remote-sync.json",
-    ".git/**"
+    ".git/** .idea .remote-sync.json"
   ],
   "username": "root",
   "password": "raspberry",
