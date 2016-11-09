@@ -11,7 +11,7 @@ end
 
 print("Connecting to WiFi access point...")
 wifi.setmode(wifi.STATION)
-wifi.sta.config("Siec_Szefa","24ogoralki")
+
 -- wifi.sta.connect() not necessary because config() uses auto-connect=true by default
 tmr.alarm(1, 1000, 1, function()
     if wifi.sta.getip() == nil then
@@ -22,6 +22,7 @@ tmr.alarm(1, 1000, 1, function()
         print("You have 3 seconds to abort")
         print("Waiting... ")
         collectgarbage()
+        -- it is time to brake init
         tmr.alarm(0, 3000, 0, startup)
     end
 end)
