@@ -1,3 +1,5 @@
+dofile("credentials.lua")
+
 function startup()
     if file.open("init.lua") == nil then
         print("init.lua deleted or renamed")
@@ -11,7 +13,7 @@ end
 
 print("Connecting to WiFi access point...")
 wifi.setmode(wifi.STATION)
-
+wifi.sta.config(SSID,PASSWORD)
 -- wifi.sta.connect() not necessary because config() uses auto-connect=true by default
 tmr.alarm(1, 1000, 1, function()
     if wifi.sta.getip() == nil then
