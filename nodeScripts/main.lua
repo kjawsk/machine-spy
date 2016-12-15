@@ -1,13 +1,12 @@
--- Configuration to connect to the MQTT broker.
-BROKER = "192.168.0.103"   -- Ip/hostname of MQTT broker
-BRPORT = 1884             -- MQTT broker port
-BRUSER = ""           -- If MQTT authenitcation is used then define the user
-BRPWD  = ""            -- The above user password
-CLIENTID = "ESP8266-" ..  node.chipid() -- The MQTT ID. Change to something you like
+BROKER = "192.168.0.103"
+BRPORT = 1884
+BRUSER = ""
+BRPWD  = ""
+CLIENTID = "ESP8266-" ..  node.chipid()
+INPUT_PIN = 1
+TEST_PIN = 2
 TIMER_TIMEOUT = 5000
 MQTT_KEEPALIVE = 120
-
--- Control variables.
 id1 = 0
 
 function publish_data()
@@ -23,22 +22,32 @@ function receive_data(client, topic, data)
     end
 end
 
---main program to run after the subscriptions are done
+function toggle_input()
+    if gpio.read(INPUT_PIN) == 1 then
+        gpio.write(TEST_PIN, gpio.LOW)
+    else
+        gpio.write(TEST_PIN, gpio.HIGH)
+    end
+end
+
 function run_main_prog()
     print("Connected to MQTT:" .. BROKER .. ":" .. BRPORT .." as " .. CLIENTID )
 
-    -- publish data with TIMER_TIMEOUT interval
-    tmr.alarm(1, TIMER_TIMEOUT, tmr.ALARM_AUTO, publish_data)
+    gpio.mode(INPUT_PIN, gpio.INT)
+    gpio.trig(INPUT_PIN, "up", publish_data)
 
-    m:subscribe("/ping",0, function(client) print("subscribe success") end)
+    -- it is only for testing purposes - toggle input every TIMER_TIMEOUT
+    gpio.mode(TEST_PIN, gpio.OUTPUT)
+    tmr.alarm(1, TIMER_TIMEOUT, tmr.ALARM_AUTO, toggle_input)
+
+    m:subscribe("/ping",0, function(client) print("Subscribe success") end)
     m:on("message", receive_data)
 end
 
 function handle_connection_error (client, reason)
-    print("failed reason: "..reason)
+    print("Failed reason: "..reason)
 end
 
--- connect to the broker
 print "Connecting to MQTT broker. Please wait..."
 m = mqtt.Client( CLIENTID, MQTT_KEEPALIVE, BRUSER, BRPWD)
 m:connect( BROKER , BRPORT, 0, run_main_prog, handle_connection_error)
