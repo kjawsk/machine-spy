@@ -1,16 +1,20 @@
 import unittest
+import datetime
 import sys
 sys.path.append('..')
-from server import app as serverApp
+from server import app
+from server.models import db
+from flask import json
 
 
 class ServerTestCase(unittest.TestCase):
 
     def setUp(self):
-        serverApp.config['TESTING'] = True
-        serverApp.config['SQLALCHEMY_DATABASE_URI'] = \
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = \
             "sqlite:///tmp.db"
-        self.app = serverApp.test_client()
+        self.app = app.test_client()
+        db.create_all()
 
     def test_main_page(self):
         rv = self.app.get('/', follow_redirects=True)
@@ -22,10 +26,17 @@ class ServerTestCase(unittest.TestCase):
             machine_id='ESP-1',
             date=datetime.datetime.now()))
 
-        rv = self.app.post('/messages', data=request, follow_redirects=True)
+        rv = self.app.post(
+            '/entries',
+            data=request,
+            content_type='application/json')
+
+        self.assertNotIn('415 Unsupported Media Type', rv.data.decode('utf-8'))
+        self.assertIn('Entry added', rv.data.decode('utf-8'))
 
     def tearDown(self):
-        pass
+        db.session.remove()
+        db.drop_all()
 
 if __name__ == '__main__':
     unittest.main()
