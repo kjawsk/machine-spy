@@ -10,7 +10,7 @@ MQTT_KEEPALIVE = 120
 id1 = 0
 
 function publish_data()
-    m:publish("/test", CLIENTID .. " publish_data: " .. id1,0,0, function(conn)
+    m:publish("/test", CLIENTID,0,0, function(conn)
         print("Sending data: " .. id1)
         id1 = id1 + 1
     end)
