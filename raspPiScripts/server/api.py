@@ -1,6 +1,6 @@
 from flask import request, json, render_template, flash, url_for
 from server import app
-from server.models import db, Entry
+from server.models import db, Entry, Sensor
 import datetime
 import os
 
@@ -13,10 +13,10 @@ def index():
     return 'Hello World!'
 
 @app.route('/entries', methods = ['POST'])
-def api_entry():
+def add_entry():
     if request.headers['Content-Type'] == 'application/json':
         content = request.get_json(silent=True)
-        new_entry = Entry(content['machine_id'])
+        new_entry = Entry(content['sensor_name'])
         add_to_db(new_entry)
         return 'Entry added: ' + str(content)
     else:
