@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-import datetime
+from server.utils import MyDate
 
 db = SQLAlchemy()
 
@@ -10,4 +10,4 @@ class Entry(db.Model):
 
     def __init__(self, machine_id):
         self.machine_id = machine_id
-        self.date = datetime.datetime.now()
+        self.date = MyDate.now()
