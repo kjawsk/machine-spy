@@ -3,24 +3,32 @@ import datetime
 import sys
 sys.path.append('..')
 from server import app
-from server.models import db, Entry
+from server.models import db, Entry, Sensor
 from server.utils import MyDate
 from flask import json
 from mock import MagicMock
 
-class PostMessageTestCase(unittest.TestCase):
+class PostEntryTestCase(unittest.TestCase):
 
     def setUp(self):
+        self.config_environment()
+
+        self.date = MyDate.now()
+        MyDate.now = MagicMock(return_value=self.date)
+
+        sensor = Sensor('ESP-1')
+        db.session.add(sensor)
+        db.session.commit()
+        self.sensor_id = sensor.id
+
+        self.request = json.dumps(dict(sensor_name=sensor.name))
+
+    def config_environment(self):
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = \
             "sqlite:///tmp.db"
         self.app = app.test_client()
         db.create_all()
-
-        self.date = MyDate.now()
-        self.machine_id = 'ESP-1'
-        MyDate.now = MagicMock(return_value=self.date)
-        self.request = json.dumps(dict(machine_id=self.machine_id))
 
     def test_post_message(self):
         rv = self.app.post(
@@ -30,9 +38,10 @@ class PostMessageTestCase(unittest.TestCase):
 
         self.assertIn('Entry added', rv.data.decode('utf-8'))
         self.assertNotIn('415 Unsupported Media Type', rv.data.decode('utf-8'))
-        entries = db.session.query(Entry)
-        self.assertEqual(entries[0].date, self.date)
-        self.assertEqual(entries[0].machine_id, self.machine_id)
+
+        entry = Entry.query.filter_by(date=self.date).first()
+        self.assertEqual(entry.date, self.date)
+        self.assertEqual(entry.sensor_id, self.sensor_id)
 
     def test_post_message_with_invalid_header(self):
         rv = self.app.post(
