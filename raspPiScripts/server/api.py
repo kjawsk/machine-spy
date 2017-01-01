@@ -10,7 +10,7 @@ def add_to_db(item):
 
 @app.route('/')
 def index():
-    return 'Hello World!'
+    return 'Main page!'
 
 @app.route('/entries', methods = ['POST'])
 def add_entry():
