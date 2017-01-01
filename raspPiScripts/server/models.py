@@ -19,4 +19,4 @@ class Sensor(db.Model):
     entries = db.relationship('Entry', backref='sensor', lazy='dynamic')
 
     def __init__(self, sensor_name):
-        self.sensor_name = sensor_name
+        self.name = sensor_name
