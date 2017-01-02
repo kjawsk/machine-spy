@@ -89,7 +89,7 @@ class AddSensorTestCase(unittest.TestCase):
             follow_redirects=True)
 
         self.assertIn(
-            'Field must be between 15 and 15 characters long',
+            'Name must be 15 character long',
             rv.data.decode('utf-8'))
 
         sensor_name = 'ESP8266-13511777' # 16 charachters
@@ -100,7 +100,7 @@ class AddSensorTestCase(unittest.TestCase):
             follow_redirects=True)
 
         self.assertIn(
-            'Field must be between 15 and 15 characters long',
+            'Name must be 15 character long',
             rv.data.decode('utf-8'))
 
     def tearDown(self):
