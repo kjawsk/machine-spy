@@ -15,7 +15,7 @@ class Entry(db.Model):
 
 class Sensor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40), unique=True)
+    name = db.Column(db.String(15), unique=True)
     entries = db.relationship('Entry', backref='sensor', lazy='dynamic')
 
     def __init__(self, sensor_name):
