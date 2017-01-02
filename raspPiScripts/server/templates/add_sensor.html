@@ -1,0 +1,8 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "layout.html" %}
+{% block body %}
+<form id=add_sensor_form method=post action="{{ url_for('add_sensor') }}">
+    {{ render_field(form.name) }}
+  <p><input id=add_btn type=submit value='Add sensor'></p>
+</form>
+{% endblock %}
