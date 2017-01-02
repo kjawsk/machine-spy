@@ -14,3 +14,4 @@ db.init_app(app)
 db.app = app
 
 import server.api
+import server.views

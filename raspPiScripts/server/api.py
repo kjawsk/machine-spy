@@ -28,13 +28,3 @@ def add_entry():
         return 'Entry added: ' + str(content)
     else:
         return '415 Unsupported Media Type'
-
-@app.route('/sensor/add', methods = ['POST', 'GET'])
-def add_sensor():
-    form = AddSensorForm(request.form)
-    if request.method == 'POST' and form.validate():
-        new_sensor = Sensor(form.name.data)
-        add_to_db(new_sensor)
-        flash('Sensor sucessfully added')
-        return redirect(url_for('add_sensor'))
-    return render_template('add_sensor.html', form=form)
