@@ -23,7 +23,7 @@ def initdb_command():
 def add_entry():
     if request.headers['Content-Type'] == 'application/json':
         content = request.get_json(silent=True)
-        new_entry = Entry(content['sensor_name'])
+        new_entry = Entry(content['sensor_name'], content['value'])
         add_to_db(new_entry)
         return 'Entry added: ' + str(content)
     else:

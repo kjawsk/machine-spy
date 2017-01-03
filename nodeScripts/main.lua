@@ -9,23 +9,24 @@ TIMER_TIMEOUT = 5000
 MQTT_KEEPALIVE = 120
 GPIO_TIMER = 0
 RECONNECT_TIMER = 1
-IS_BROKER_CONNECTED = 0
-id1 = 0
+is_broker_connected = 0
+tick_counter = 0
 
 -------------------- MQTT HANDLING -----------------------------
 
 function publish_data()
-    id1 = id1 + 1
-    if IS_BROKER_CONNECTED == 1 then
-        m:publish("/test", CLIENTID,0,0, function(conn)
-            print("Sending data: " .. id1)
-        end)
+    tick_counter = tick_counter + 1
+    if is_broker_connected == 1 then
+        m:publish("/test",
+            CLIENTID .. '/' .. tick_counter,
+            0,0, function(conn) print("Sending data: " .. tick_counter) end)
+        tick_counter = 0
     end
 end
 
 function handle_broker_offline(client)
     print ("Connection to the broker is lost. Reconnecting...")
-    IS_BROKER_CONNECTED = 0
+    is_broker_connected = 0
     m:close()
 
     tmr.alarm(RECONNECT_TIMER, TIMER_TIMEOUT, tmr.ALARM_AUTO, connect_to_broker)
@@ -42,7 +43,7 @@ function connect_to_broker()
         function (client)
             print("Connected to MQTT:" .. BROKER .. ":" .. BRPORT .." as " .. CLIENTID )
             tmr.unregister(RECONNECT_TIMER)
-            IS_BROKER_CONNECTED = 1
+            is_broker_connected = 1
         end,
         handle_connection_error
     )

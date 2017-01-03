@@ -7,11 +7,13 @@ class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sensor_id = db.Column(db.Integer, db.ForeignKey('sensor.id'))
     date = db.Column(db.DateTime(30))
+    value = db.Column(db.Integer)
 
-    def __init__(self, sensor_name):
+    def __init__(self, sensor_name, value):
         sensor = Sensor.query.filter_by(name=sensor_name).first()
         self.sensor_id = sensor.id
         self.date = MyDate.now()
+        self.value = value
 
 class Sensor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
