@@ -19,7 +19,6 @@ def on_message(client, userdata, msg):
 
     print(msg.topic + " name: " + str(content[0]) + " value: " +  str(content[1]))
 
-    #dict({'sensor_name':content[0]})
     data = {}
     data['sensor_name'] = content[0]
     data['value'] = content[1]

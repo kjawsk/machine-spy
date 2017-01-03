@@ -5,7 +5,8 @@ BRPWD  = ""
 CLIENTID = "ESP8266-" ..  node.chipid()
 INPUT_PIN = 1
 TEST_PIN = 2
-TIMER_TIMEOUT = 5000
+GPIO_TMR_TIMEOUT = 5000
+MQTT_TMR_TIMEOUT = 2000
 MQTT_KEEPALIVE = 120
 GPIO_TIMER = 0
 RECONNECT_TIMER = 1
@@ -29,7 +30,7 @@ function handle_broker_offline(client)
     is_broker_connected = 0
     m:close()
 
-    tmr.alarm(RECONNECT_TIMER, TIMER_TIMEOUT, tmr.ALARM_AUTO, connect_to_broker)
+    tmr.alarm(RECONNECT_TIMER, MQTT_TMR_TIMEOUT, tmr.ALARM_AUTO, connect_to_broker)
 end
 
 function handle_connection_error (client, reason)
@@ -53,11 +54,11 @@ end
 -------------------- GPIO HANDLING -----------------------------
 
 function toggle_input()
-    print("Input toggled")
     if gpio.read(INPUT_PIN) == 1 then
         gpio.write(TEST_PIN, gpio.LOW)
     else
         gpio.write(TEST_PIN, gpio.HIGH)
+        print("Rising edge! " .. tick_counter)
     end
 end
 
@@ -67,9 +68,9 @@ function gpio_handling()
     gpio.mode(INPUT_PIN, gpio.INT)
     gpio.trig(INPUT_PIN, "up", publish_data)
 
-    -- it is only for testing purposes - toggle input every TIMER_TIMEOUT
+    -- it is only for testing purposes - toggle input every GPIO_TMR_TIMEOUT
     gpio.mode(TEST_PIN, gpio.OUTPUT)
-    tmr.alarm(GPIO_TIMER, TIMER_TIMEOUT, tmr.ALARM_AUTO, toggle_input)
+    tmr.alarm(GPIO_TIMER, GPIO_TMR_TIMEOUT, tmr.ALARM_AUTO, toggle_input)
 end
 
 ----------------------------------------------------------------
