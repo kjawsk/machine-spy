@@ -16,16 +16,6 @@ class PostEntryTestCase(unittest.TestCase):
         self.date = MyDate.now()
         MyDate.now = MagicMock(return_value=self.date)
 
-        sensor = Sensor('ESP-1')
-        db.session.add(sensor)
-        db.session.commit()
-        self.sensor_id = sensor.id
-
-        data = {}
-        data['sensor_name'] = sensor.name
-        data['value'] = 15
-        self.request = json.dumps(data)
-
     def config_environment(self):
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = \
@@ -33,10 +23,28 @@ class PostEntryTestCase(unittest.TestCase):
         self.app = app.test_client()
         db.create_all()
 
+    def add_sensor(self, name):
+        sensor = Sensor(name)
+        db.session.add(sensor)
+        db.session.commit()
+        self.sensor_id = sensor.id
+
+    def create_request(self, sensor_name, value):
+        data = {}
+        data['sensor_name'] = sensor_name
+        data['value'] = value
+        return json.dumps(data)
+
     def test_post_message(self):
+        sensor_name = 'ESP8266-1122334'
+        self.add_sensor(sensor_name)
+
+        value = 14
+        request = self.create_request(sensor_name, value)
+
         rv = self.app.post(
             '/entries',
-            data=self.request,
+            data=request,
             content_type='application/json')
 
         self.assertIn('Entry added', rv.data.decode('utf-8'))
@@ -45,12 +53,18 @@ class PostEntryTestCase(unittest.TestCase):
         entry = Entry.query.filter_by(date=self.date).first()
         self.assertEqual(entry.date, self.date)
         self.assertEqual(entry.sensor_id, self.sensor_id)
-        self.assertEqual(entry.value, 15)
+        self.assertEqual(entry.value, value)
 
     def test_post_message_with_invalid_header(self):
+        sensor_name = 'ESP8266-1122334'
+        self.add_sensor(sensor_name)
+
+        value = 14
+        request = self.create_request(sensor_name, value)
+
         rv = self.app.post(
             '/entries',
-            data=self.request,
+            data=request,
             content_type='INVALID HEADER')
 
         self.assertNotIn('Entry added', rv.data.decode('utf-8'))
@@ -63,26 +77,31 @@ class PostEntryTestCase(unittest.TestCase):
 class AddSensorTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.config_environment()
-
-    def config_environment(self):
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = \
             "sqlite:///tmp.db"
         self.app = app.test_client()
         db.create_all()
+        username = 'meaningless'
+        password = 'meaningless'
+        self.add_user(username, password)
+        self.login_user(username, password)
 
-        self.username = 'user1'
-        self.password = 'password1'
-        user = User(self.username, self.password)
+    def add_user(self, username, password):
+        user = User(username, password)
         db.session.add(user)
         db.session.commit()
-        rv = self.app.post(
-            '/login',
+
+    def login_user(self, username, password):
+        return self.app.post('/login',
             data=(dict(
-                username=self.username,
-                password=self.password)),
+                username=username,
+                password=password)),
             follow_redirects=True)
+
+    def logout_user(self):
+        return self.app.get('/logout', follow_redirects=True)
+
 
     def test_add_sensor(self):
         sensor_name = 'ESP8266-1351177' # 15 charachters
@@ -118,6 +137,18 @@ class AddSensorTestCase(unittest.TestCase):
         self.assertIn(
             'Name must be 15 character long',
             rv.data.decode('utf-8'))
+
+    def test_add_sensor_with_not_logged_user(self):
+        self.logout_user()
+        sensor_name = 'ESP8266-1351177' # 15 charachters
+
+        rv = self.app.post(
+            '/sensor/add',
+            data=dict(name=sensor_name),
+            follow_redirects=True)
+
+        self.assertNotIn('Sensor sucessfully added', rv.data.decode('utf-8'))
+        self.assertIn('Please log in to access this page', rv.data.decode('utf-8'))
 
     def tearDown(self):
         db.session.remove()
