@@ -21,22 +21,6 @@ def is_safe_url(target):
 def user_loader(user_id):
     return User.query.get(user_id)
 
-@app.route('/sensor/add', methods = ['POST', 'GET'])
-@login_required
-def add_sensor():
-    form = AddSensorForm(request.form)
-    if request.method == 'POST' and form.validate():
-        new_sensor = Sensor(form.name.data)
-        add_to_db(new_sensor)
-        flash('Sensor sucessfully added')
-
-        next = request.args.get('next')
-        if not is_safe_url(next):
-            return flask.abort(400)
-
-        return redirect(url_for('add_sensor'))
-    return render_template('add_sensor.html', form=form)
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm(request.form)
@@ -61,3 +45,26 @@ def logout():
     logout_user()
     flash('You were logged out')
     return redirect(url_for('login'))
+
+@app.route('/sensor/add', methods = ['POST', 'GET'])
+@login_required
+def add_sensor():
+    form = AddSensorForm(request.form)
+    if request.method == 'POST' and form.validate():
+        new_sensor = Sensor(form.name.data)
+        add_to_db(new_sensor)
+        flash('Sensor sucessfully added')
+
+        next = request.args.get('next')
+        if not is_safe_url(next):
+            return flask.abort(400)
+
+        return redirect(url_for('add_sensor'))
+    return render_template('add_sensor.html', form=form)
+
+@app.route('/sensor/edit/<id>', methods = ['GET'])
+@login_required
+def edit_sensor(id):
+    form = AddSensorForm(request.form)
+    form.name.data = db.session.query(Sensor.name).filter_by(id=id).scalar()
+    return render_template('add_sensor.html', form=form)
