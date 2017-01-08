@@ -62,9 +62,21 @@ def add_sensor():
         return redirect(url_for('add_sensor'))
     return render_template('add_sensor.html', form=form)
 
-@app.route('/sensor/edit/<id>', methods = ['GET'])
+@app.route('/sensor/edit/<id>', methods = ['GET', 'POST'])
 @login_required
 def edit_sensor(id):
     form = AddSensorForm(request.form)
-    form.name.data = db.session.query(Sensor.name).filter_by(id=id).scalar()
+    if request.method == 'GET':
+        form.name.data = db.session.query(Sensor.name).filter_by(id=id).scalar()
+    elif request.method == 'POST' and form.validate():
+        sensor = Sensor.query.filter_by(id=id).first()
+        sensor.name = form.name.data
+        db.session.commit()
+        flash('Sensor has been changed')
+
+        next = request.args.get('next')
+        if not is_safe_url(next):
+            return flask.abort(400)
+
+        return redirect(url_for('add_sensor'))
     return render_template('add_sensor.html', form=form)
