@@ -3,7 +3,6 @@ credentials.lua
 runTerminal
 flask_env
 *.db
-config.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
