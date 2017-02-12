@@ -1,5 +1,5 @@
 BROKER = "192.168.0.103"
-BRPORT = 1884
+BRPORT = 8883
 BRUSER = ""
 BRPWD  = ""
 CLIENTID = "ESP8266-" ..  node.chipid()
@@ -40,7 +40,7 @@ end
 function connect_to_broker()
     print ("Waiting for the broker")
     m:connect(
-        BROKER, BRPORT, 0,
+        BROKER, BRPORT, 1,
         function (client)
             print("Connected to MQTT:" .. BROKER .. ":" .. BRPORT .." as " .. CLIENTID )
             tmr.unregister(RECONNECT_TIMER)
