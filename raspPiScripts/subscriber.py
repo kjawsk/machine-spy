@@ -23,7 +23,6 @@ def on_message(client, userdata, msg):
     data['sensor_name'] = content[0]
     data['value'] = content[1]
     json_data = json.dumps(data)
-    # Post Sensor Data
     post_json_data(json_data)
 
 if __name__ == '__main__':

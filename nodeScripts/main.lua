@@ -1,5 +1,5 @@
 BROKER = "192.168.0.103"
-BRPORT = 8883
+BRPORT = 1884
 BRUSER = ""
 BRPWD  = ""
 CLIENTID = "ESP8266-" ..  node.chipid()
@@ -39,7 +39,6 @@ end
 
 function connect_to_broker()
     print ("Waiting for the broker")
-    tls.cert.verify(true)
     m:connect(
         BROKER, BRPORT, 1,
         function (client)
