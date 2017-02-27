@@ -39,6 +39,7 @@ end
 
 function connect_to_broker()
     print ("Waiting for the broker")
+    tls.cert.verify(true)
     m:connect(
         BROKER, BRPORT, 1,
         function (client)
