@@ -30,6 +30,6 @@ if __name__ == '__main__':
     client.on_connect = on_connect
     client.on_message = on_message
 
-    client.connect("localhost", 1884, 60)
+    client.connect("localhost", 1883, 60)
 
     client.loop_forever()
