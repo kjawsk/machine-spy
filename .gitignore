@@ -4,6 +4,7 @@ runTerminal
 flask_env
 *.db
 nodeScripts/tools/
+cert.lua
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
