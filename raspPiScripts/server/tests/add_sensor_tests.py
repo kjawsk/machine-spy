@@ -48,6 +48,23 @@ class AddSensorTestCase(unittest.TestCase):
         sensor = Sensor.query.filter_by(name=sensor_name).first()
         self.assertEqual(sensor_name, sensor.name)
 
+    def test_add_sensor_with_not_unique_name(self):
+        sensor_name = 'ESP8266-1351177'
+
+        rv = self.app.post(
+            '/sensor/add',
+            data=dict(name=sensor_name),
+            follow_redirects=True)
+
+        self.assertIn('Sensor sucessfully added', rv.data.decode('utf-8'))
+
+        rv = self.app.post(
+            '/sensor/add',
+            data=dict(name=sensor_name),
+            follow_redirects=True)
+
+        self.assertIn('Sensor already exist, name is not unique', rv.data.decode('utf-8'))
+
     def test_add_sensor_with_invalid_name_length(self):
         sensor_name = 'ESP8266-135117' # 14 charachters
 
