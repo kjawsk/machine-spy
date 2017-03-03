@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from .util import mydate as MyDate
+from .util.mydate import MyDate
 from passlib.hash import sha256_crypt
 
 db = SQLAlchemy()
