@@ -1,8 +1,7 @@
 import unittest
 import sys
-sys.path.append('../..')
-from server import app
-from server.models import db, Sensor, User
+from .. import app
+from ..models import db, Sensor, User
 
 class AddSensorTestCase(unittest.TestCase):
 

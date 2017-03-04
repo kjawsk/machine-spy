@@ -1,6 +1,5 @@
 import unittest
 import sys
-sys.path.append('../..')
 from server import app
 from server.models import db, Entry, Sensor, User
 from server.util.mydate import MyDate
