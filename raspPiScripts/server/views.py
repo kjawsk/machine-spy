@@ -46,6 +46,13 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('login'))
 
+@app.route('/index/')
+@app.route('/sensor/view/')
+@login_required
+def show_sensors():
+    sensors = Sensor.query.all()
+    return render_template('show_sensors.html', sensors=sensors)
+
 @app.route('/sensor/add', methods = ['POST', 'GET'])
 @login_required
 def add_sensor():
