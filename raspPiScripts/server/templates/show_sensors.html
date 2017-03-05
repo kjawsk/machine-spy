@@ -1,0 +1,12 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "layout.html" %}
+{% block body %}
+    <table>
+    <tr><th>ID</th><th>Sensor Name</th><th>Label</th>
+    {% for sensor in sensors %}
+        <tr><td>{{sensor.id}}</td><td>{{sensor.name}}</td><td>Label</td>
+    {% else %}
+        There is no sensors
+    {% endfor %}
+    </table>
+{% endblock %}
