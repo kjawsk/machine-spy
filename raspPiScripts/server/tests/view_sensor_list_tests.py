@@ -3,7 +3,7 @@ import os
 from server import app
 from server.models import db, Sensor, User
 
-class EditSensorTestCase(unittest.TestCase):
+class ViewSensorListTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
