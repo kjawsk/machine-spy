@@ -1,9 +1,6 @@
-from flask import request, json, render_template, flash, url_for, redirect
+from flask import request
 from server import app
-from server.models import db, Entry, Sensor
-from server.forms import AddSensorForm
-import datetime
-import os
+from server.models import db, Entry
 
 def add_to_db(item):
     db.session.add(item)
@@ -19,12 +16,11 @@ def initdb_command():
     db.create_all()
     print('Initialized the database.')
 
-@app.route('/entries', methods = ['POST'])
+@app.route('/entries', methods=['POST'])
 def add_entry():
     if request.headers['Content-Type'] == 'application/json':
         content = request.get_json(silent=True)
         new_entry = Entry(content['sensor_name'], content['value'])
         add_to_db(new_entry)
         return 'Entry added: ' + str(content)
-    else:
-        return '415 Unsupported Media Type'
+    return '415 Unsupported Media Type'
